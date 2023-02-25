@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+	client2 "github.com/selefra/selefra-provider-mock/client"
 	"github.com/selefra/selefra-provider-mock/tables"
 	"github.com/selefra/selefra-provider-sdk/table_schema_generator"
 
@@ -21,18 +22,19 @@ func GetProvider() *provider.Provider {
 		},
 		ClientMeta: schema.ClientMeta{
 			InitClient: func(ctx context.Context, clientMeta *schema.ClientMeta, config *viper.Viper) ([]any, *schema.Diagnostics) {
-				return nil, nil
+				client, diagnostics := client2.NewClient(config)
+				return []any{client}, diagnostics
 			},
 		},
 		ConfigMeta: provider.ConfigMeta{
 			GetDefaultConfigTemplate: func(ctx context.Context) string {
-				return `# Optional. by default assumes all regions
-# regions:
-#   - us-east-1
-#   - us-west-2`
+				return `#foo-count: 3
+#bar-count: 2
+#sleep-seconds: 0`
 			},
 			Validation: func(ctx context.Context, config *viper.Viper) *schema.Diagnostics {
-				return nil
+				_, diagnostics := client2.NewClient(config)
+				return diagnostics
 			},
 		},
 		TransformerMeta:   schema.TransformerMeta{},
