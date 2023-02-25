@@ -7,6 +7,7 @@ import (
 	"github.com/selefra/selefra-provider-sdk/provider/transformer/column_value_extractor"
 	"github.com/selefra/selefra-provider-sdk/table_schema_generator"
 	"github.com/selefra/selefra-utils/pkg/id_util"
+	"time"
 )
 
 type TableMockFooGenerator struct {
@@ -37,7 +38,7 @@ func (x *TableMockFooGenerator) GetOptions() *schema.TableOptions {
 func (x *TableMockFooGenerator) GetDataSource() *schema.DataSource {
 	return &schema.DataSource{
 		Pull: func(ctx context.Context, clientMeta *schema.ClientMeta, client any, task *schema.DataSourcePullTask, resultChannel chan<- any) *schema.Diagnostics {
-			for i := 0; i < 100; i++ {
+			for i := 0; i < 10; i++ {
 				foo := &Foo{
 					ID:    "foo-" + id_util.RandomId(),
 					Key:   fmt.Sprintf("foo-key-%d", i),
@@ -68,6 +69,10 @@ func (x *TableMockFooGenerator) GetColumns() []*schema.Column {
 			Extractor(column_value_extractor.StructSelector("Key")).Build(),
 		table_schema_generator.NewColumnBuilder().ColumnName("value").ColumnType(schema.ColumnTypeString).
 			Extractor(column_value_extractor.StructSelector("Value")).Build(),
+		table_schema_generator.NewColumnBuilder().ColumnName("create_time").ColumnType(schema.ColumnTypeString).
+			Extractor(column_value_extractor.WrapperExtractFunction(func(ctx context.Context, clientMeta *schema.ClientMeta, client any, task *schema.DataSourcePullTask, row *schema.Row, column *schema.Column, result any) (any, *schema.Diagnostics) {
+				return time.Now(), nil
+			})).Build(),
 	}
 }
 
