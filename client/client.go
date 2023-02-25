@@ -28,7 +28,7 @@ func NewClient(config *viper.Viper) (*Client, *schema.Diagnostics) {
 
 	diagnostics := schema.NewDiagnostics()
 	if c.SleepSeconds < 0 {
-		diagnostics.AddErrorMsg("sleep-seconds must > 0")
+		diagnostics.AddErrorMsg("sleep-seconds must >= 0")
 	}
 	if c.FooCount <= 0 {
 		diagnostics.AddErrorMsg("foo-count must > 0")
