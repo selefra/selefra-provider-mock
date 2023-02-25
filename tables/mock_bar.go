@@ -3,6 +3,7 @@ package tables
 import (
 	"context"
 	"fmt"
+	"github.com/selefra/selefra-provider-mock/client"
 	"github.com/selefra/selefra-provider-sdk/provider/schema"
 	"github.com/selefra/selefra-provider-sdk/provider/transformer/column_value_extractor"
 	"github.com/selefra/selefra-provider-sdk/table_schema_generator"
@@ -37,8 +38,9 @@ func (x *TableMockBarGenerator) GetOptions() *schema.TableOptions {
 
 func (x *TableMockBarGenerator) GetDataSource() *schema.DataSource {
 	return &schema.DataSource{
-		Pull: func(ctx context.Context, clientMeta *schema.ClientMeta, client any, task *schema.DataSourcePullTask, resultChannel chan<- any) *schema.Diagnostics {
-			for i := 0; i < 3; i++ {
+		Pull: func(ctx context.Context, clientMeta *schema.ClientMeta, taskClient any, task *schema.DataSourcePullTask, resultChannel chan<- any) *schema.Diagnostics {
+			client := taskClient.(*client.Client)
+			for i := 0; i < client.Config.BarCount; i++ {
 				bar := &Bar{
 					ID:    "bar-" + id_util.RandomId(),
 					Key:   fmt.Sprintf("bar-key-%d", i),

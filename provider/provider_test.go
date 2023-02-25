@@ -20,11 +20,9 @@ import (
 func TestProvider_PullTable(t *testing.T) {
 	wk := "./"
 
-	config := `providers:
-    # provider configurations
-    - name: mock
-      max_backoff: 30
-`
+	config := `foo-count: 1
+bar-count: 1
+sleep-seconds: 1`
 
 	myProvider := GetProvider()
 
