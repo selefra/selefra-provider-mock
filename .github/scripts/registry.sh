@@ -12,7 +12,12 @@ esac
 
 version=v${1}
 time=$(date "+%Y-%m-%d")
-VERSION=`cat provider/mock/metadata.yaml | grep 'latest-version' | awk -F ' ' '{print $2}'`
+if [ -f "provider/mock/metadata.yaml" ];then
+  VERSION=`cat provider/mock/metadata.yaml | grep 'latest-version' | awk -F ' ' '{print $2}'`
+else
+  VERSION="mock"
+  mkdir -p provider/mock
+fi
 FOR=`cat selefra-provider-mock* | awk -F '_' '{print $3,$4}' | awk -F '.' '{print $1}' |  sed "s# #_#g"`
 if [ -d "provider/mock/$version" ];then rm -rf provider/mock/$version ; else echo "OK!"; fi && cp -r provider/template/version1 provider/mock/$version
 
@@ -36,13 +41,15 @@ done
 
 if [[ "$VERSION" != "$version" ]]; then
   cp provider/template/metadata.yaml provider/template/metadata.yaml.bak
-  sed "${sedi[@]}" "s#{{.ProviderName}}#mock#g" provider/template/metadata.yaml 
+  sed "${sedi[@]}" "s#{{.ProviderName}}#mock#g" provider/template/metadata.yaml
   sed "${sedi[@]}" "s#{{.LatestVersion}}#${version}#g" provider/template/metadata.yaml
   sed "${sedi[@]}" "s#{{.LatestUpdated}}#${time}#g" provider/template/metadata.yaml
-  sed "${sedi[@]}" "s#{{.Introduction}}#A Selefra provider for mock.#g" provider/template/metadata.yaml
+  sed "${sedi[@]}" "s#{{.Introduction}}#A Selefra provider for mock .#g" provider/template/metadata.yaml
   sed "${sedi[@]}" "s#{{.ProviderVersion}}#${version}#g" provider/template/metadata.yaml
   sed "${sedi[@]}" '6d' provider/template/metadata.yaml
-  sed -n '/^ /p' provider/mock/metadata.yaml >> provider/template/metadata.yaml
+  if [ -f "provider/mock/metadata.yaml" ];then
+    sed -n '/^ /p' provider/mock/metadata.yaml >> provider/template/metadata.yaml
+  fi
   echo "  - ${version}" >> provider/template/metadata.yaml
   cat provider/template/metadata.yaml > provider/mock/metadata.yaml
   mv provider/template/metadata.yaml.bak provider/template/metadata.yaml
