@@ -47,6 +47,11 @@ func (x *TableMockBarGenerator) GetDataSource() *schema.DataSource {
 					Value: fmt.Sprintf("bar-value-%d", i),
 				}
 				resultChannel <- bar
+
+				if client.Config.SleepSeconds > 0 {
+					time.Sleep(time.Second * time.Duration(client.Config.SleepSeconds))
+				}
+
 			}
 			return nil
 		},
