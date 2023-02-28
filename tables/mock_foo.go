@@ -47,6 +47,11 @@ func (x *TableMockFooGenerator) GetDataSource() *schema.DataSource {
 					Value: fmt.Sprintf("foo-value-%d", i),
 				}
 				resultChannel <- foo
+
+				if client.Config.SleepSeconds > 0 {
+					time.Sleep(time.Second * time.Duration(client.Config.SleepSeconds))
+				}
+
 			}
 			return nil
 		},
